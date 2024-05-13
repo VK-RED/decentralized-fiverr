@@ -2,6 +2,7 @@
   "name": "web3project",
   "private": true,
   "scripts": {
+    "migrate:db": "dotenv -e .env -- npx prisma migrate dev --schema=packages/db/prisma/schema.prisma",
     "build": "turbo build",
     "dev": "dotenv -- turbo dev",
     "lint": "turbo lint",
