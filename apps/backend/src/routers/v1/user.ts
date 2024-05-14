@@ -3,31 +3,35 @@ import jwt from 'jsonwebtoken';
 import {db} from "@repo/db/src";
 import {s3} from "@repo/aws/s3";
 import { generateRandomString } from '../../utils';
+import { auth } from '../../middleware';
 
 const bucket = process.env.AWS_BUCKET_NAME as string;
 
 export const userRouter = Router();
 
-const generatePresignedUrl = async()=>{
+const generatePresignedUrl = async(userId:string)=>{
     const randomString = generateRandomString();
     const params = {
         Bucket: bucket,
-        Key: `/${randomString}/image.png`,
+        Key: `${userId}/${randomString}/image.png`,
         Expires: 60 * 5,
     };
     const url = s3.getSignedUrl('putObject', params);
     return url;
 }
 
-userRouter.get("/presignedUrl",async (req,res)=>{
-    // TODO : MAKE THIS AS AN AUTH GET THE REQ.ID FROM IT
+userRouter.get("/presignedUrl",auth,async (req,res)=>{
+    
     try {
-        const url = await generatePresignedUrl();
+        const userId:string = req.body.userId;
+        if(!userId){
+            throw new Error("Can't find the userId");
+        }
+        const url = await generatePresignedUrl(userId);
         return res.json({url});
     } catch (error) {
-        console.log("Error in Generating Presigned Url --------")
         console.error(error);
-        throw new Error("Error in Generating Presigned Url");
+        return res.json({message:"Error in Generating Presigned URL !"});
     }
     
 })
