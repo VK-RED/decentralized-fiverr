@@ -4,6 +4,8 @@ import {db} from "@repo/db/src";
 import {s3} from "@repo/aws/s3";
 import { generateRandomString } from '../../utils';
 import { auth } from '../../middleware';
+import { ZodError } from 'zod';
+import {postTaskSchema} from "@repo/common/schema";
 
 const bucket = process.env.AWS_BUCKET_NAME as string;
 
@@ -51,4 +53,60 @@ userRouter.post("/signin",async(req:Request,res:Response)=>{
     const jwtSecret = process.env.JWT_SECRET as string;
     const token = jwt.sign({address:user.address},jwtSecret,{expiresIn:'24h'});
     return res.json({token});
+})
+
+userRouter.post("/task",auth,async(req,res)=>{
+    try {
+        const body = postTaskSchema.parse(req.body);
+        const userId = req.body.userId as string;
+
+        //TODO: VALIDATE THE SIGNATURE FROM BODY
+
+        // FOR NOW ASSUMING SIGNATURE IS VALID;
+
+        //CREATING THE TASK
+
+        const task = await db.task.create({
+            data:{
+                amount:body.amount,
+                signature:body.signature,
+                title:body.title || "Select the Attractive Image",
+                userId,
+            },
+            select:{
+                id:true,
+            }
+        })
+
+        //CREATING THE OPTIONS
+
+        const promises = [];
+
+        for(let i = 0; i < body.urls.length; i++){
+            const url = body.urls[i] as string;
+            const promise = db.option.create({
+                data:{
+                    img_url:url,
+                    position:i+1,
+                    taskId:task.id
+                }
+            })
+            promises.push(promise);    
+        }
+
+        await Promise.all(promises);
+        console.log(promises);
+        return res.json({message:"Successfully created the task !!"});
+
+    } catch (error) {
+        if(error instanceof ZodError){
+            const message = error.issues[0]?.message
+            return res.json({message});
+        }
+        else{
+            console.error(error);
+            return res.json({message:"ERROR IN CREATING A TASK"})
+        }
+    }
+    
 })
