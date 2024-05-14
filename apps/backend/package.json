@@ -21,6 +21,8 @@
     "@types/jsonwebtoken": "^9.0.6",
     "tsup": "^8.0.2",
     "@repo/db" : "*",
-    "@repo/aws":"*"
+    "@repo/aws":"*",
+    "@repo/common":"*",
+    "@repo/zod":"*"
   }
 }
