@@ -24,6 +24,7 @@ model Task {
   submissions Submission[]
   signature String
   amount String
+  completed Boolean @default(false)
   // results TaskResult[]  TODO: DO THIS IN THE CLEANEST FASHION
 }
 
