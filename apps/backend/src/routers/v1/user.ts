@@ -6,7 +6,7 @@ import { generateRandomString } from '../../utils';
 import { auth } from '../../middleware';
 import { ZodError } from 'zod';
 import {postTaskSchema} from "@repo/common/schema";
-
+import {TaskOptions,ResultMessage,GetTask} from "@repo/common/types";
 const bucket = process.env.AWS_BUCKET_NAME as string;
 
 export const userRouter = Router();
@@ -109,4 +109,58 @@ userRouter.post("/task",auth,async(req,res)=>{
         }
     }
     
+})
+
+userRouter.get("/task/:id",auth,async(req:Request<{id:string}>,res) :
+(Promise<Response<ResultMessage|GetTask>>) =>
+{
+    const userId = req.body.userId;
+    const taskId = req.params.id;
+    
+    // Get the task from db
+
+    const task = await db.task.findFirst({
+        where:{
+            id:taskId,
+            userId
+        },
+        include:{
+            submissions:{
+                select:{
+                    option_id:true,
+                }
+            },
+            options:true,
+        }
+    });
+
+    if(!task){
+        return res.json({message:"Enter Valid Task Id"});
+    }
+
+    //Find out which option is performing better, To do that maintain a counterMap
+
+    const counterMap:TaskOptions = {};
+
+    //Traverse on the options to initiate CounterMap
+    
+    const options = task.options;
+    options.map(({id,img_url,position})=>{
+        counterMap[id] = {count:0,img_url,position};
+    })
+    
+    //Traverse on the submissions to increase the count;
+
+    const submissions = task.submissions;
+
+    submissions.map((s)=>{
+        const value = counterMap[s.option_id];
+        if(value){
+            counterMap[s.option_id] = {...value,count:value.count+1};
+        }
+    }) 
+
+    console.log("Counter map : ",counterMap);
+    
+    return res.json({allOptions:counterMap});
 })
