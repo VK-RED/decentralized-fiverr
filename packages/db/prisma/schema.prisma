@@ -45,7 +45,8 @@ model Submission {
   task    Task @relation(fields: [taskId], references: [id])
   worker    Worker @relation(fields: [workerId], references: [id])
   option    Option @relation(fields: [option_id], references: [id])
-  amount  String
+  amount  String?
+  @@unique([taskId,workerId])
 }
 
 model Worker {
