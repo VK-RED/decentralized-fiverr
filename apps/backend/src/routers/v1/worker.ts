@@ -2,6 +2,9 @@ import { db } from '@repo/db/src';
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { workerAuth } from '../../middleware';
+import { submissionSchema } from '@repo/common/schema';
+import { ZodError } from 'zod';
+import { getNextTask } from '../../db';
 
 export const workerRouter = Router();
 
@@ -28,25 +31,13 @@ workerRouter.post("/signin",async(req,res)=>{
     return res.json({token});
 })
 
-// TODO: Test this route heavily once the submitTask is completed
+
 workerRouter.get("/nextTask",workerAuth,async(req,res)=>{
     const workerId = req.body.workerId as string;
 
     //Find a task where the relational submission table should not contain the workerId
     console.log(workerId);
-    const nextTask = await db.task.findFirst({
-       where:{
-        submissions:{
-            none:{
-                workerId
-            }
-        },
-        completed:false
-       },
-       include:{
-        options:true,
-       },
-    });
+    const nextTask = await getNextTask(workerId);
 
     if(!nextTask){
         return res.json({
@@ -57,4 +48,60 @@ workerRouter.get("/nextTask",workerAuth,async(req,res)=>{
     
     const task = {title:nextTask.title,options:nextTask.options};
     return res.json({task});
+})
+
+
+workerRouter.post("/submission",workerAuth,async(req,res)=>{
+    const workerId = req.body.workerId as string;
+
+    try {
+
+        const{optionId,taskId} = submissionSchema.parse(req.body);
+
+        //If the task is completed or does n't exist or not the specified task then throw an error
+        const task = await getNextTask(workerId);
+        
+        if(!task || taskId !== task.id){
+            return res.json({message:"Enter valid TaskId"});
+        }
+
+        // TODO: FIX A LIMIT && IF THAT'S REACHED THEN DON'T ALLOW THE USER
+        if(task.completed){
+            return res.json({message:"The Task is not Open Anymore !"});
+        }
+
+        //Check if the user already submitted a response
+        const submission = task.submissions.find((sub)=>sub.workerId === workerId);
+
+        if(submission){
+            return res.json({message:"Already Submitted the response !!"})
+        }
+
+        // TODO : FIX THE TOTAL SUBMISSIONS
+
+        const limit = 100;
+        const bounty = (Number(task.amount)/limit).toString();
+        
+        const newSubmission = await db.submission.create({
+            data:{
+                taskId,
+                option_id:Number(optionId),
+                workerId,
+                amount:bounty,
+            }
+        })
+
+        return res.json({amount:newSubmission.amount})
+
+    } catch (error) {
+        if(error instanceof ZodError){
+            const message = error.issues[0]?.message
+            return res.json({message});
+        }
+        else{
+            console.error(error);
+            return res.json({message:"ERROR IN CREATING A TASK"})
+        }
+    }
+
 })
