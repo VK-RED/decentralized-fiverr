@@ -6,3 +6,8 @@ export const postTaskSchema = z.object({
     amount: z.string(),
     urls: z.string().array(),
 })
+
+export const submissionSchema = z.object({
+    optionId : z.string(),
+    taskId: z.string(),
+})
