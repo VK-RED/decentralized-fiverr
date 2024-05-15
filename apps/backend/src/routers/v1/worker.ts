@@ -81,17 +81,48 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
 
         const limit = 100;
         const bounty = (Number(task.amount)/limit).toString();
-        
-        const newSubmission = await db.submission.create({
-            data:{
-                taskId,
-                option_id:Number(optionId),
-                workerId,
-                amount:bounty,
-            }
-        })
 
-        return res.json({amount:newSubmission.amount})
+        await db.$transaction(async(tx)=>{
+            const newSubmission = await tx.submission.create({
+                data:{
+                    taskId,
+                    option_id:Number(optionId),
+                    workerId,
+                    amount:bounty,
+                }
+            });
+
+            const existingBalance = await tx.balance.findFirst({
+                where:{
+                    workerId,
+                },
+                select:{
+                    available_amount:true,
+                }
+            })
+
+            const availablePay = existingBalance?.available_amount || 0;
+
+            await tx.balance.upsert({
+                where:{
+                    workerId
+                },
+                create:{
+                    workerId,
+                    available_amount:Number(bounty),
+                    locked_amount:0,
+                },
+                update:{
+                    available_amount:Number(bounty) + availablePay,
+                }
+            })
+            
+            return res.json({amount:newSubmission.amount})
+            
+        })
+        
+        return res.json({message:"Error in Submitting the task"})
+        
 
     } catch (error) {
         if(error instanceof ZodError){
@@ -100,7 +131,7 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
         }
         else{
             console.error(error);
-            return res.json({message:"ERROR IN CREATING A TASK"})
+            return res.json({message:"Error in Submitting the task !!"})
         }
     }
 
