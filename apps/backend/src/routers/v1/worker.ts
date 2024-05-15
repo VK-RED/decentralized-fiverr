@@ -23,6 +23,6 @@ workerRouter.post("/signin",async(req,res)=>{
         update:{}
     });
 
-    const token = jwt.sign({workerId:worker.id},workerSecret,{expiresIn:'24h'});
+    const token = jwt.sign({address:worker.address},workerSecret,{expiresIn:'24h'});
     return res.json({token});
 })
