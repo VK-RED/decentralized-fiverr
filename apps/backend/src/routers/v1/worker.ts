@@ -136,3 +136,21 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
     }
 
 })
+
+workerRouter.get("/balance",workerAuth,async(req,res)=>{
+    const workerId = req.body.workerId as string;
+    const balance = await db.balance.findFirst({
+        where:{
+            workerId,
+        }
+    });
+
+    if(!balance){
+        return res.json({message:"No balance found for the workerId !!"});
+    }
+
+    return res.json({
+        availableAmount:balance.available_amount,
+        lockedAmount:balance.locked_amount,
+    });
+})
