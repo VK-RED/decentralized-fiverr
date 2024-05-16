@@ -16,24 +16,24 @@ model User {
 }
 
 model Task {
-  id      String   @id @default(cuid())
-  title   String
-  options Option[]
-  userId  String
-  user    User     @relation(fields: [userId], references: [id])
+  id          String       @id @default(cuid())
+  title       String
+  options     Option[]
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
   submissions Submission[]
-  signature String
-  amount Int @default(0)
-  completed Boolean @default(false)
+  signature   String
+  amount      Int          @default(0)
+  completed   Boolean      @default(false)
   // results TaskResult[]  TODO: DO THIS IN THE CLEANEST FASHION
 }
 
 model Option {
-  id          Int         @id @default(autoincrement())
-  position    Int
-  img_url     String
-  taskId      String
-  task        Task        @relation(fields: [taskId], references: [id])
+  id         Int         @id @default(autoincrement())
+  position   Int
+  img_url    String
+  taskId     String
+  task       Task        @relation(fields: [taskId], references: [id])
   submission Submission?
 }
 
@@ -42,11 +42,12 @@ model Submission {
   workerId  String
   option_id Int    @unique
   taskId    String
-  task    Task @relation(fields: [taskId], references: [id])
+  task      Task   @relation(fields: [taskId], references: [id])
   worker    Worker @relation(fields: [workerId], references: [id])
   option    Option @relation(fields: [option_id], references: [id])
-  amount  Int?
-  @@unique([taskId,workerId])
+  amount    Int?
+
+  @@unique([taskId, workerId])
 }
 
 model Worker {
@@ -54,17 +55,17 @@ model Worker {
   address     String
   submissions Submission[]
   balance     Balance?
+
   @@unique([address])
 }
 
-model Balance{
-  id         String @id @default(cuid())
-  workerId  String @unique
-  worker    Worker @relation(fields: [workerId], references: [id])
-  available_amount    Int
-  locked_amount  Int
+model Balance {
+  id               String @id @default(cuid())
+  workerId         String @unique
+  worker           Worker @relation(fields: [workerId], references: [id])
+  available_amount Int
+  locked_amount    Int
 }
-
 
 // TODO : Design the TaskResult in a Better fashion
 
@@ -77,4 +78,3 @@ model Balance{
 //   option_3  Int
 //   option_4  Int
 // }
-
