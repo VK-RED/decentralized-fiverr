@@ -7,6 +7,7 @@ import { auth } from '../../middleware';
 import { ZodError } from 'zod';
 import {postTaskSchema} from "@repo/common/schema";
 import {TaskOptions,ResultMessage,GetTask} from "@repo/common/types";
+import {TOTAL_DECIMAL} from "@repo/common/messages";
 const bucket = process.env.AWS_BUCKET_NAME as string;
 
 export const userRouter = Router();
@@ -64,11 +65,11 @@ userRouter.post("/task",auth,async(req,res)=>{
 
         // FOR NOW ASSUMING SIGNATURE IS VALID;
 
-        //CREATING THE TASK
+        //CREATING THE TASK (You will be getting the amount in SOL -> Convert to LAMPORT)
 
         const task = await db.task.create({
             data:{
-                amount:body.amount,
+                amount:body.amount*TOTAL_DECIMAL,
                 signature:body.signature,
                 title:body.title || "Select the Attractive Image",
                 userId,

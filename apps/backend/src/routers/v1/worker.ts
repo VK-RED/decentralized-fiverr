@@ -80,7 +80,7 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
         // TODO : FIX THE TOTAL SUBMISSIONS
 
         const limit = 100;
-        const bounty = (Number(task.amount)/limit).toString();
+        const bounty = task.amount/limit; // The bounty will be in lamports
 
         await db.$transaction(async(tx)=>{
             const newSubmission = await tx.submission.create({
@@ -109,11 +109,11 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
                 },
                 create:{
                     workerId,
-                    available_amount:Number(bounty),
+                    available_amount:bounty,
                     locked_amount:0,
                 },
                 update:{
-                    available_amount:Number(bounty) + availablePay,
+                    available_amount:bounty + availablePay,
                 }
             })
             
