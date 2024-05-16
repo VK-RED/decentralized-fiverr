@@ -154,3 +154,16 @@ workerRouter.get("/balance",workerAuth,async(req,res)=>{
         lockedAmount:balance.locked_amount,
     });
 })
+
+workerRouter.post("/payout",workerAuth,async(req,res)=>{
+    const workerId = req.body.workerId as string;
+
+    /* 
+        Get the amount in SOL
+        Check if that balance is available and above the threshold
+        if not return appropriate message
+
+        else move the money from available to locked
+        and notify the user
+    */
+})
