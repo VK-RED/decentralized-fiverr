@@ -2,7 +2,7 @@
   "name": "web3project",
   "private": true,
   "scripts": {
-    "migrate:db": "dotenv -e .env -- npx prisma migrate dev --schema=packages/db/prisma/schema.prisma",
+    "migrate:db": "dotenv -e .env -- npx prisma migrate dev --schema=packages/db/prisma/schema.prisma && yarn run generate:db",
     "generate:db":"yarn run loadenv -- yarn run generate ",
     "generate":"cd packages/db/ && yarn run generate",
     "reset:db":"yarn run loadenv -- yarn run prisma:reset",
