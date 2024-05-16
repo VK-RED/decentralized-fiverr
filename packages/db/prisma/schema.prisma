@@ -8,9 +8,10 @@ datasource db {
 }
 
 model User {
-  id      String @id @default(cuid())
+  id      String   @id @default(cuid())
   address String
   tasks   Task[]
+  payouts Payout[]
 
   @@unique([address])
 }
@@ -55,6 +56,7 @@ model Worker {
   address     String
   submissions Submission[]
   balance     Balance?
+  payouts     Payout[]
 
   @@unique([address])
 }
@@ -65,6 +67,22 @@ model Balance {
   worker           Worker @relation(fields: [workerId], references: [id])
   available_amount Int
   locked_amount    Int
+}
+
+model Payout {
+  id       String    @id @default(cuid())
+  workerId String
+  userId   String
+  amount   Int
+  worker   Worker    @relation(references: [id], fields: [workerId])
+  user     User      @relation(references: [id], fields: [userId])
+  status   TxnStatus
+}
+
+enum TxnStatus {
+  Processing
+  Success
+  Failure
 }
 
 // TODO : Design the TaskResult in a Better fashion
