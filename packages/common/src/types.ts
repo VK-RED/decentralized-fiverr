@@ -18,3 +18,8 @@ export type SubmissionInput = z.infer<typeof submissionSchema>;
 export interface SubmissionResult{
     amount:string
 }
+
+export interface GetBalance{
+    availableAmount:number,
+    lockedAmount:number,
+}
