@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "migrate:db": "dotenv -e .env -- npx prisma migrate dev --schema=packages/db/prisma/schema.prisma",
-    "generate:prisma":"yarn run loadenv -- yarn run generate ",
+    "generate:db":"yarn run loadenv -- yarn run generate ",
     "generate":"cd packages/db/ && yarn run generate",
     "reset:db":"yarn run loadenv -- yarn run prisma:reset",
     "prisma:reset":"cd packages/db && yarn run reset",
