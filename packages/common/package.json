@@ -8,7 +8,8 @@
   },
   "exports":{
     "./schema" : "./src/schema.ts",
-    "./types" : "./src/types.ts"
+    "./types" : "./src/types.ts",
+    "./messages":"./src/messages.ts"
   },
   "keywords": [],
   "author": "",
