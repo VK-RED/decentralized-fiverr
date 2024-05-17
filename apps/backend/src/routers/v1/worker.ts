@@ -158,12 +158,75 @@ workerRouter.get("/balance",workerAuth,async(req,res)=>{
 workerRouter.post("/payout",workerAuth,async(req,res)=>{
     const workerId = req.body.workerId as string;
 
-    /* 
-        Get the amount in SOL
-        Check if that balance is available and above the threshold
-        if not return appropriate message
+    const worker = await db.worker.findFirst({
+        where:{
+            id:workerId
+        },
+        select:{
+            address:true,
+        }
+    })
 
-        else move the money from available to locked
-        and notify the user
-    */
+    if(!worker){
+        return res.json({message:"Cannot find the worker !!"});
+    }
+
+    const amount = await db.balance.findFirst({
+        where:{
+            workerId,
+        },
+        select:{
+            available_amount:true,
+        }
+    });
+
+    if(!amount || amount.available_amount === 0){
+        return res.json({message:"Balance is empty !!"});
+    }
+
+    //TODO: Create a transactionId using Solana web3.js
+
+    const recepient = worker.address; 
+    const TxnId = "kj3bj34j13n43jk13"
+
+    await db.$transaction(async tx => {
+
+        //Move this amount from available to locked and create a Payout
+
+        await tx.balance.update({
+            where:{
+                workerId,
+            },
+            data:{
+                available_amount:{
+                    decrement:amount.available_amount,
+                },
+                locked_amount:{
+                    increment: amount.available_amount,
+                }
+            }
+        })
+
+        await tx.payout.create({
+            data:{
+                amount:amount.available_amount,
+                status:"Processing",
+                workerId,
+                signature:TxnId
+
+            }
+        })
+
+
+    })
+
+    // TODO : Send the transaction to Blockchain
+
+
+    return res.json({
+        status:"Processing Payout",
+        amount: amount.available_amount,
+    })
+
+    
 })
