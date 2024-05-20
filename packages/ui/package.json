@@ -8,7 +8,9 @@
     "./code": "./src/code.tsx",
     "./navbar":"./src/navbar.tsx",
     "./task":"./src/task.tsx",
-    "./uploadImage":"./src/uploadImage.tsx"
+    "./uploadImage":"./src/uploadImage.tsx",
+    "./imageRenderer":"./src/imageRenderer.tsx",
+    "./imageHandler":"./src/imageHandler.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
