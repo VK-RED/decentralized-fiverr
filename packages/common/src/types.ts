@@ -23,3 +23,7 @@ export interface GetBalance{
     availableAmount:number,
     lockedAmount:number,
 }
+
+export interface DivProps{
+    className?:string,
+}
