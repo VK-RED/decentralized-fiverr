@@ -1,11 +1,11 @@
 import { Task } from "@repo/ui/task";
-import { UploadImage } from "@repo/ui/uploadImage";
+import { ImageHandler } from "@repo/ui/imageHandler";
 
 export default function Page(){
   return (
     <div className="flex flex-col items-center">
       <Task className="mt-10"/>
-      <UploadImage className="mt-8"/>
+      <ImageHandler/>
     </div>
   )
 }
