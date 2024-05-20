@@ -21,9 +21,12 @@ export const UploadImage = ({className,setImages}:UploadImageProps) => {
         let arr : HTMLImageElement[]= [];
         if(files){
             for(const file of files){
-                let newImg = new Image(300,300);
+                let newImg = new Image(200,700);
                 newImg.src = URL.createObjectURL(file);
-                arr.push(newImg);
+                if(arr.length<5){
+                    arr.push(newImg);
+                }
+                
             }   
         }
         setImages((p)=>arr);
