@@ -10,6 +10,8 @@
     "studio": "dotenv -e .env -- npm run init:studio",
     "init:studio" : "cd packages/db && npx prisma studio & ",
     "dev:backend" : "dotenv -- turbo dev --filter=backend",
+    "dev:web":"dotenv -- turbo dev --filter=web",
+    "dev:web-worker":"dotenv -- turbo dev --filter=web-worker",
     "loadenv" : "dotenv -e .env",
     "build": "turbo build",
     "dev": "dotenv -- turbo dev",
