@@ -1,11 +1,7 @@
 'use client';
 
-import { DivProps } from "@repo/common/types";
+import { ImageRendererProps } from "@repo/common/types";
 import { useEffect } from "react";
-
-export interface ImageRendererProps extends DivProps{
-    images?:string[],
-}
 
 export const ImageRenderer = ({className,images}:ImageRendererProps) => {
 

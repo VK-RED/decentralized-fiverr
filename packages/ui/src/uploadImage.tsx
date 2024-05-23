@@ -1,11 +1,7 @@
 'use client';
 
-import { DivProps } from "@repo/common/types";
-import { Dispatch, useRef } from "react";
-
-export interface UploadImageProps extends DivProps{
-    setImages: Dispatch<React.SetStateAction<string[]|undefined>>
-}
+import { UploadImageProps } from "@repo/common/types";
+import { useRef } from "react";
 
 export const UploadImage = ({className,setImages}:UploadImageProps) => {
 

@@ -27,3 +27,11 @@ export interface GetBalance{
 export interface DivProps{
     className?:string,
 }
+
+export interface ImageRendererProps extends DivProps{
+    images?:string[],
+}
+
+export interface UploadImageProps extends DivProps{
+    setImages: React.Dispatch<React.SetStateAction<string[]|undefined>>
+}
