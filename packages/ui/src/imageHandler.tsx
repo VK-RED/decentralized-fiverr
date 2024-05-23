@@ -7,11 +7,11 @@ import { useState } from "react";
 
 export const ImageHandler = ({className}:DivProps) => {
 
-    const [images,setImages] = useState<HTMLImageElement[]>();
+    const [images,setImages] = useState<string[]>();
 
     return (
-        <div className={` ${className}`}>
-            <ImageRenderer className="mt-10" images={images}/>
+        <div className={`w-full ${className}`}>
+            <ImageRenderer className="mt-3" images={images}/>
             <UploadImage className="mt-8" setImages={setImages}/>
         </div>
     )

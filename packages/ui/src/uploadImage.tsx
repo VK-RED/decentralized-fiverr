@@ -4,7 +4,7 @@ import { DivProps } from "@repo/common/types";
 import { Dispatch, useRef } from "react";
 
 export interface UploadImageProps extends DivProps{
-    setImages: Dispatch<React.SetStateAction<HTMLImageElement[]|undefined>>
+    setImages: Dispatch<React.SetStateAction<string[]|undefined>>
 }
 
 export const UploadImage = ({className,setImages}:UploadImageProps) => {
@@ -18,18 +18,14 @@ export const UploadImage = ({className,setImages}:UploadImageProps) => {
     const setFiles = (e: React.ChangeEvent<HTMLInputElement>)=>{
         
         const files = e.target.files;
-        let arr : HTMLImageElement[]= [];
+        const temp:string[] = [];
         if(files){
             for(const file of files){
-                let newImg = new Image(200,700);
-                newImg.src = URL.createObjectURL(file);
-                if(arr.length<5){
-                    arr.push(newImg);
-                }
-                
+                const imageURL = URL.createObjectURL(file);
+                temp.push(imageURL);
             }   
         }
-        setImages((p)=>arr);
+        setImages((p)=>temp);
     }
 
 
