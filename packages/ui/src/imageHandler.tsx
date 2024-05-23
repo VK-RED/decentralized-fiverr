@@ -10,7 +10,7 @@ export const ImageHandler = ({className}:DivProps) => {
     const [images,setImages] = useState<string[]>();
 
     return (
-        <div className={`w-full ${className}`}>
+        <div className={`w-full flex flex-col items-center ${className}`}>
             <ImageRenderer className="mt-3" images={images}/>
             <UploadImage className="mt-8" setImages={setImages}/>
         </div>
