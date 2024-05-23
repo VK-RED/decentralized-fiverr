@@ -1,7 +1,7 @@
 'use client';
 
 import { DivProps } from "@repo/common/types";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export interface ImageRendererProps extends DivProps{
     images?:string[],
@@ -34,6 +34,14 @@ export const ImageRenderer = ({className,images}:ImageRendererProps) => {
                     ))
                 }
             </div>
+
+            {
+                images?.length > 0 &&
+                <button 
+                    className="text-md mt-5 bg-black text-white px-2 py-1 rounded-md font-medium">
+                    Submit
+                </button>
+            }
         </div>  
     )
 }
