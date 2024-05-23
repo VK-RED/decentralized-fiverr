@@ -1,13 +1,13 @@
 'use client';
 
-import { DivProps } from "@repo/common/types"
+import { DivProps, UploadedFile } from "@repo/common/types"
 import { UploadImage } from "./uploadImage"
 import { ImageRenderer } from "./imageRenderer"
 import { useState } from "react";
 
 export const ImageHandler = ({className}:DivProps) => {
 
-    const [images,setImages] = useState<string[]>();
+    const [images,setImages] = useState<UploadedFile[]>();
 
     return (
         <div className={`w-full flex flex-col items-center ${className}`}>

@@ -11,6 +11,33 @@ export const ImageRenderer = ({className,images}:ImageRendererProps) => {
         }
     },[images])
 
+    const handleSubmit = async() => {
+        //get a presigned-URL
+
+        //TODO : FIX THE TOKEN LOGIC TO GET FROM BACKEND
+        const result = await fetch("http://localhost:8000/v1/user/signin",{
+            method:"POST"
+        });
+        const d = await result.json();
+        const jwtToken = d.token;
+        
+        const res = await fetch("http://localhost:8000/v1/user/presignedUrl",{
+            method:"GET",
+            headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer "+jwtToken,
+            },
+        });
+        const data = await res.json();
+        const uploadUrl = data.url;
+        console.log("Upload URL : ",uploadUrl);
+
+        //till now got the upload URL
+        //now convert the photo to dataURI and upload it
+
+        
+    }
+
     if(!images){
         return null;
     }
@@ -26,14 +53,14 @@ export const ImageRenderer = ({className,images}:ImageRendererProps) => {
                 {
                     images &&
                     images.map((i,ind)=>(
-                        <img className="w-[300px] h-[150px]" key={ind}  src={i}/>
+                        <img className="w-[300px] h-[150px]" key={ind}  src={i.fileUri}/>
                     ))
                 }
             </div>
 
             {
                 images?.length > 0 &&
-                <button 
+                <button onClick={handleSubmit}
                     className="text-md mt-5 bg-black text-white px-2 py-1 rounded-md font-medium">
                     Submit
                 </button>

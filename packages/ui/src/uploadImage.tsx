@@ -1,6 +1,6 @@
 'use client';
 
-import { UploadImageProps } from "@repo/common/types";
+import { UploadImageProps, UploadedFile } from "@repo/common/types";
 import { useRef } from "react";
 
 export const UploadImage = ({className,setImages}:UploadImageProps) => {
@@ -14,12 +14,12 @@ export const UploadImage = ({className,setImages}:UploadImageProps) => {
     const setFiles = (e: React.ChangeEvent<HTMLInputElement>)=>{
         
         const files = e.target.files;
-        const temp:string[] = [];
+        const temp:UploadedFile[] = [];
         if(files){
             for(const file of files){
                 if(temp.length < 5){
                     const imageURL = URL.createObjectURL(file);
-                    temp.push(imageURL);
+                    temp.push({file,fileUri:imageURL});
                 }
             }   
         }

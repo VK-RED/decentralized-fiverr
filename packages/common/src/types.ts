@@ -28,10 +28,15 @@ export interface DivProps{
     className?:string,
 }
 
+export interface UploadedFile{
+    fileUri:string,
+    file:File,
+}
+
 export interface ImageRendererProps extends DivProps{
-    images?:string[],
+    images?:UploadedFile[],
 }
 
 export interface UploadImageProps extends DivProps{
-    setImages: React.Dispatch<React.SetStateAction<string[]|undefined>>
+    setImages: React.Dispatch<React.SetStateAction<UploadedFile[]|undefined>>
 }
