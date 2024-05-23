@@ -21,14 +21,16 @@ export const UploadImage = ({className,setImages}:UploadImageProps) => {
         const temp:string[] = [];
         if(files){
             for(const file of files){
-                const imageURL = URL.createObjectURL(file);
-                temp.push(imageURL);
+                if(temp.length < 5){
+                    const imageURL = URL.createObjectURL(file);
+                    temp.push(imageURL);
+                }
             }   
         }
         setImages((p)=>temp);
     }
 
-
+    
     return (
         <div className={`space-y-3 ${className}`}>
             <div>
