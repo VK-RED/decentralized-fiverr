@@ -1,35 +1,46 @@
 'use client';
 
-import { BACKEND_URL } from "@repo/common/messages";
+import { BACKEND_URL, TASK_SUCCESS, UPLOAD_SUCCESS } from "@repo/common/messages";
 import { ImageRendererProps } from "@repo/common/types";
-
+import type { PostTask, ResultMessage } from "@repo/common/types";
 export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
 
     const uploadToS3 = async(presignedUrls:{url:string}[]) => {
         if(!images)return;
+        if(!task){
+            console.log("Enter task name !");
+            return;
+        }
         if(images.length !== presignedUrls.length){
             console.error("PresignedUrls mismatch");
             return;
         };
         const promises:Promise<Response>[] = [];
-        for(let i = 0; i < images.length; i++){
-            const uploadedFile = images[i];
-            const uploadUrl = presignedUrls[i];
-            if(!uploadedFile || !uploadUrl){
-                console.log("File or URI not present");
-                return
+        try {
+            for(let i = 0; i < images.length; i++){
+                const uploadedFile = images[i];
+                const uploadUrl = presignedUrls[i];
+                if(!uploadedFile || !uploadUrl){
+                    console.log("File or URI not present");
+                    return
+                }
+                const myHeaders = new Headers({ 'Content-Type': 'image/*' });
+                const promiseRes = fetch(uploadUrl.url,{
+                    method:"PUT",
+                    headers: myHeaders,
+                    body:uploadedFile.file,
+                });
+                promises.push(promiseRes);
             }
-            const myHeaders = new Headers({ 'Content-Type': 'image/*' });
-            const promiseRes = fetch(uploadUrl.url,{
-                method:"PUT",
-                headers: myHeaders,
-                body:uploadedFile.file,
-            });
-            promises.push(promiseRes);
+            await Promise.all(promises);
+            console.log("Uploaded the Images Successfully !");
+            return UPLOAD_SUCCESS;
+        } catch (error) {
+            console.error(error);
+            const message = "Error in Uploading the Images";
+            return message;
         }
-        const fetchRes = await Promise.all(promises);
-        console.log(fetchRes);
-        window.console.log("Uploaded the Images Successfully !");
+        
     }
 
     const getPresignedUrls = async()=>{
@@ -60,14 +71,55 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
         return urls;
     }
 
+    const createTask = async(presignedUrls:{url:string}[]) => {
+        if(!task){
+            console.log("Enter task name !");
+            return;
+        }
+        //TODO : FIX THE AMOUNT AND SIGNATURE LATER
+
+        const amount = 1; //Assuming the amount to be 1 SOL
+        const signature = "H43TH43LTV2TG34LT3CJHKXPWIU";
+        
+        const urls = presignedUrls.map((u)=>(u.url));
+
+        const body : PostTask = {
+            title:task,
+            signature,
+            amount,
+            urls
+        }
+        const token = localStorage.getItem('token') as string;
+
+        const res = await fetch(`${BACKEND_URL}v1/user/task`,{
+            method:"POST",
+            body:JSON.stringify(body),
+            headers:{
+                "Content-Type": "application/json",
+                "authorization": "Bearer "+token,
+            }
+        });
+        const {message} :ResultMessage = await res.json();
+        if(message !== TASK_SUCCESS){
+            console.error(message);
+        }
+        else{
+            console.log(message);
+        }
+    }
+
     const handleSubmit = async() => {
-        //get a presigned-URL
+        
         const presignedUrls = await getPresignedUrls();
         if(!presignedUrls){
             console.log("Error in Getting Presigned Urls !");
             return;
         }
-        await uploadToS3(presignedUrls);
+        const uploadRes = await uploadToS3(presignedUrls);
+        if(uploadRes === UPLOAD_SUCCESS){
+            //Only if everything succeeds create a Task
+            await createTask(presignedUrls);
+        }
     }
 
     if(!images){
