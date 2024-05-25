@@ -1,16 +1,9 @@
 'use client';
 
 import { BACKEND_URL } from "@repo/common/messages";
-import { ImageRendererProps, UploadedFile } from "@repo/common/types";
-import { useEffect, useState } from "react";
+import { ImageRendererProps } from "@repo/common/types";
 
 export const ImageRenderer = ({className,images}:ImageRendererProps) => {
-
-    useEffect(()=>{
-        if(images){
-           console.log("Uploaded the images !");
-        }
-    },[images]);
 
     const uploadToS3 = async(presignedUrls:{url:string}[]) => {
         if(!images)return;
@@ -36,7 +29,7 @@ export const ImageRenderer = ({className,images}:ImageRendererProps) => {
         }
         const fetchRes = await Promise.all(promises);
         console.log(fetchRes);
-        window.alert("Uploaded the Images Successfully !");
+        window.console.log("Uploaded the Images Successfully !");
     }
 
     const getPresignedUrls = async()=>{
