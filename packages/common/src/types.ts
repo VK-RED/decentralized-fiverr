@@ -12,7 +12,10 @@ export interface ResultMessage{
 
 export interface GetTask{
     allOptions:TaskOptions,
+    title:string
 }
+
+export type GetTaskResult = Partial<GetTask&ResultMessage>
 
 export type SubmissionInput = z.infer<typeof submissionSchema>;
 

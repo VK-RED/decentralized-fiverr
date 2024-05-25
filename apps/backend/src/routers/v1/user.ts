@@ -164,5 +164,5 @@ userRouter.get("/task/:id",auth,async(req:Request<{id:string}>,res) :
 
     console.log("Counter map : ",counterMap);
     
-    return res.json({allOptions:counterMap});
+    return res.json({allOptions:counterMap,title:task.title});
 })
