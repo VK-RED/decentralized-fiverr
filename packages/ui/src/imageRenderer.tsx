@@ -3,7 +3,7 @@
 import { BACKEND_URL } from "@repo/common/messages";
 import { ImageRendererProps } from "@repo/common/types";
 
-export const ImageRenderer = ({className,images}:ImageRendererProps) => {
+export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
 
     const uploadToS3 = async(presignedUrls:{url:string}[]) => {
         if(!images)return;
