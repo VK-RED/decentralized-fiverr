@@ -2,9 +2,11 @@
 
 import { BACKEND_URL, TASK_SUCCESS, UPLOAD_SUCCESS } from "@repo/common/messages";
 import { ImageRendererProps } from "@repo/common/types";
-import type { PostTask, ResultMessage } from "@repo/common/types";
-export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
+import type { PostTask, PostTaskResult, ResultMessage } from "@repo/common/types";
+import { useRouter } from 'next/navigation'
 
+export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
+    const router = useRouter();
     const uploadToS3 = async(presignedUrls:{url:string}[]) => {
         if(!images)return;
         if(!task){
@@ -99,12 +101,13 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
                 "authorization": "Bearer "+token,
             }
         });
-        const {message} :ResultMessage = await res.json();
+        const {message,taskId} :PostTaskResult = await res.json();
         if(message !== TASK_SUCCESS){
             console.error(message);
         }
         else{
             console.log(message);
+            return taskId;
         }
     }
 
@@ -118,7 +121,8 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
         const uploadRes = await uploadToS3(presignedUrls);
         if(uploadRes === UPLOAD_SUCCESS){
             //Only if everything succeeds create a Task
-            await createTask(presignedUrls);
+            const taskId = await createTask(presignedUrls);
+            router.push(`/task/${taskId}`);
         }
     }
 

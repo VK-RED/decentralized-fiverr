@@ -97,7 +97,7 @@ userRouter.post("/task",auth,async(req,res)=>{
 
         await Promise.all(promises);
         console.log(promises);
-        return res.json({message:"Successfully created the task !!"});
+        return res.json({message:"Successfully created the task !!",taskId:task.id});
 
     } catch (error) {
         if(error instanceof ZodError){

@@ -50,3 +50,7 @@ export interface ImageHandlerProps extends DivProps{
 export interface TaskProps extends ImageHandlerProps{
     setTask:Dispatch<SetStateAction<string>>
 }
+
+export interface PostTaskResult extends ResultMessage{
+    taskId:string
+}
