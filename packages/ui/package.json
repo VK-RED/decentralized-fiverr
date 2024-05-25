@@ -11,7 +11,8 @@
     "./uploadImage":"./src/uploadImage.tsx",
     "./imageRenderer":"./src/imageRenderer.tsx",
     "./imageHandler":"./src/imageHandler.tsx",
-    "./webclient":"./src/webClient.tsx"
+    "./webclient":"./src/webClient.tsx",
+    "./taskOptionsRenderer" : "./src/taskOptionsRenderer.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
