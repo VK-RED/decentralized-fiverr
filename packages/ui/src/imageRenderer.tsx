@@ -2,7 +2,7 @@
 
 import { BACKEND_URL, TASK_SUCCESS, UPLOAD_SUCCESS } from "@repo/common/messages";
 import { ImageRendererProps } from "@repo/common/types";
-import type { PostTask, PostTaskResult, ResultMessage } from "@repo/common/types";
+import type { PostTask, PostTaskResult } from "@repo/common/types";
 import { useRouter } from 'next/navigation'
 
 export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
@@ -64,7 +64,7 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
         });
         
         const results = await Promise.all(fetchPromises);
-        const responses:Promise<{url:string}>[] = [];
+        const responses:Promise<{url:string,key:string}>[] = [];
         results.map((result)=>{
             const data = result.json();
             responses.push(data);
@@ -73,7 +73,7 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
         return urls;
     }
 
-    const createTask = async(presignedUrls:{url:string}[]) => {
+    const createTask = async(presignedUrls:{key:string}[]) => {
         if(!task){
             console.log("Enter task name !");
             return;
@@ -83,8 +83,9 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
         const amount = 1; //Assuming the amount to be 1 SOL
         const signature = "H43TH43LTV2TG34LT3CJHKXPWIU";
         
-        const urls = presignedUrls.map((u)=>(u.url));
-
+        const CLOUDFRONT_URL = process.env.NEXT_PUBLIC_CLOUDFRONT_URL as string;
+        const urls = presignedUrls.map((u)=>(`${CLOUDFRONT_URL}/${u.key}`));
+        console.log(urls);
         const body : PostTask = {
             title:task,
             signature,

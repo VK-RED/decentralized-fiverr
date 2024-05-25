@@ -14,13 +14,14 @@ export const userRouter = Router();
 
 const generatePresignedUrl = async(userId:string)=>{
     const randomString = generateRandomString();
+    const key = `${userId}/${randomString}/image.png`
     const params = {
         Bucket: bucket,
-        Key: `${userId}/${randomString}/image.png`,
+        Key: key,
         Expires: 60 * 5,
     };
     const url = s3.getSignedUrl('putObject', params);
-    return url;
+    return {url,key};
 }
 
 userRouter.get("/presignedUrl",auth,async (req,res)=>{
@@ -30,8 +31,8 @@ userRouter.get("/presignedUrl",auth,async (req,res)=>{
         if(!userId){
             throw new Error("Can't find the userId");
         }
-        const url = await generatePresignedUrl(userId);
-        return res.json({url});
+        const {url,key} = await generatePresignedUrl(userId);
+        return res.json({url,key});
     } catch (error) {
         console.error(error);
         return res.json({message:"Error in Generating Presigned URL !"});
