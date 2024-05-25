@@ -1,41 +1,80 @@
 'use client';
 
-import { ImageRendererProps } from "@repo/common/types";
-import { useEffect } from "react";
+import { BACKEND_URL } from "@repo/common/messages";
+import { ImageRendererProps, UploadedFile } from "@repo/common/types";
+import { useEffect, useState } from "react";
 
 export const ImageRenderer = ({className,images}:ImageRendererProps) => {
 
     useEffect(()=>{
         if(images){
-           console.log("Images present !");
+           console.log("Uploaded the images !");
         }
-    },[images])
+    },[images]);
+
+    const uploadToS3 = async(presignedUrls:{url:string}[]) => {
+        if(!images)return;
+        if(images.length !== presignedUrls.length){
+            console.error("PresignedUrls mismatch");
+            return;
+        };
+        const promises:Promise<Response>[] = [];
+        for(let i = 0; i < images.length; i++){
+            const uploadedFile = images[i];
+            const uploadUrl = presignedUrls[i];
+            if(!uploadedFile || !uploadUrl){
+                console.log("File or URI not present");
+                return
+            }
+            const myHeaders = new Headers({ 'Content-Type': 'image/*' });
+            const promiseRes = fetch(uploadUrl.url,{
+                method:"PUT",
+                headers: myHeaders,
+                body:uploadedFile.file,
+            });
+            promises.push(promiseRes);
+        }
+        const fetchRes = await Promise.all(promises);
+        console.log(fetchRes);
+        window.alert("Uploaded the Images Successfully !");
+    }
+
+    const getPresignedUrls = async()=>{
+        if(!images) return;
+        const fetchPromises:Promise<Response>[] = [];
+
+        //Get the jwt token from localstorage
+        const jwtToken = localStorage.getItem('token') as string;
+    
+        images.map((i)=>{
+            const resPromise = fetch(`${BACKEND_URL}v1/user/presignedUrl`,{
+                method:"GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": "Bearer "+jwtToken,
+                },
+            });
+            fetchPromises.push(resPromise);
+        });
+        
+        const results = await Promise.all(fetchPromises);
+        const responses:Promise<{url:string}>[] = [];
+        results.map((result)=>{
+            const data = result.json();
+            responses.push(data);
+        });
+        const urls = await Promise.all(responses);
+        return urls;
+    }
 
     const handleSubmit = async() => {
         //get a presigned-URL
-
-        //TODO : FIX THE TOKEN LOGIC TO GET FROM BACKEND
-        const result = await fetch("http://localhost:8000/v1/user/signin",{
-            method:"POST"
-        });
-        const d = await result.json();
-        const jwtToken = d.token;
-        
-        const res = await fetch("http://localhost:8000/v1/user/presignedUrl",{
-            method:"GET",
-            headers: {
-                "Content-Type": "application/json",
-                "authorization": "Bearer "+jwtToken,
-            },
-        });
-        const data = await res.json();
-        const uploadUrl = data.url;
-        console.log("Upload URL : ",uploadUrl);
-
-        //till now got the upload URL
-        //now convert the photo to dataURI and upload it
-
-        
+        const presignedUrls = await getPresignedUrls();
+        if(!presignedUrls){
+            console.log("Error in Getting Presigned Urls !");
+            return;
+        }
+        await uploadToS3(presignedUrls);
     }
 
     if(!images){
