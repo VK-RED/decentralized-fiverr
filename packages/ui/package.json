@@ -10,7 +10,8 @@
     "./task":"./src/task.tsx",
     "./uploadImage":"./src/uploadImage.tsx",
     "./imageRenderer":"./src/imageRenderer.tsx",
-    "./imageHandler":"./src/imageHandler.tsx"
+    "./imageHandler":"./src/imageHandler.tsx",
+    "./webclient":"./src/webClient.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
