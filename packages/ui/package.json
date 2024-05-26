@@ -12,7 +12,8 @@
     "./imageRenderer":"./src/imageRenderer.tsx",
     "./imageHandler":"./src/imageHandler.tsx",
     "./webclient":"./src/webClient.tsx",
-    "./taskOptionsRenderer" : "./src/taskOptionsRenderer.tsx"
+    "./taskOptionsRenderer" : "./src/taskOptionsRenderer.tsx",
+    "./nextTask":"./src/nextTask.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
