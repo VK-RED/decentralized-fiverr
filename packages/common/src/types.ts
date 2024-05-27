@@ -20,7 +20,8 @@ export type GetTaskResult = Partial<GetTask&ResultMessage>
 export type SubmissionInput = z.infer<typeof submissionSchema>;
 
 export interface SubmissionResult{
-    amount:string
+    amount?:number,
+    message?:string,
 }
 
 export interface GetBalance{
@@ -56,4 +57,19 @@ export interface TaskProps extends ImageHandlerProps{
 
 export interface PostTaskResult extends ResultMessage{
     taskId:string
+}
+
+export interface NextTaskType{
+    title:string,
+    options: {
+        id: number;
+        position: number;
+        img_url: string;
+        taskId: string;
+    }[],
+}
+
+export interface NextTaskResult{
+    message?:string;
+    task?:NextTaskType,
 }
