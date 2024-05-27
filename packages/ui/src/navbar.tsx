@@ -1,6 +1,6 @@
 'use client';
 import { BACKEND_URL, TOTAL_DECIMAL } from "@repo/common/messages";
-import { GetBalance, ResultMessage } from "@repo/common/types";
+import { GetBalance, Payout, ResultMessage } from "@repo/common/types";
 import React, { useEffect, useState } from "react"
 
 export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorkerNav:boolean}) => {
@@ -29,6 +29,25 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
         console.log();
     }   
 
+    const getPaid = async()=>{
+        if(!isWorkerNav) return;
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BACKEND_URL}v1/worker/payout`,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "authorization":"Bearer "+token
+            }
+        });
+        const data:Payout = await res.json();
+        if(data.message){
+            window.alert(data.message);
+        }
+        else if(data.amount && data.status){
+            window.alert(`${data.status} ${data.amount/TOTAL_DECIMAL} SOL`)
+        }
+    }
+
     return(
         <div>
             <div className="w-screen border max-h-16 py-1 flex justify-between px-10 items-center">
@@ -36,20 +55,24 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                     TUDUM
                 </div>
 
-                {/* TODO:IDEALLY SHOW THE BALANCE WHEN WALLET IS CONNECTED */}
+                {/* TODO:IDEALLY SHOW THE BALANCE && PAYOUT WHEN WALLET IS CONNECTED */}
+
+                {isWorkerNav && <div className="relative left-28 justify-center flex items-center gap-x-2">
+                    <div>
+                        {`Avail SOL : ${balance.availableAmount/TOTAL_DECIMAL}`}
+                    </div>
+                    <div>
+                        {`Locked SOL : ${balance.lockedAmount/TOTAL_DECIMAL}`}
+                    </div>
+                </div>}
                
-                <div className="flex gap-x-4">
+                <div className="flex items-center gap-x-4">
                     {
                         isWorkerNav &&
-                        <div className="justify-center flex items-center gap-x-2">
-                            <div>
-                                {`SOL : ${balance.availableAmount/TOTAL_DECIMAL}`}
-                            </div>
-                            <div>
-                                {`LOCKED SOL : ${balance.lockedAmount/TOTAL_DECIMAL}`}
-                            </div>
-                        </div>
-                        
+                        <button onClick={getPaid}
+                            className="text-white bg-slate-400 mx-5 py-1 px-2 rounded-md font-medium">
+                                    Payout
+                        </button>
                     }
                     <div className="font-semibold cursor-pointer">
                         CONNECT MY WALLET
