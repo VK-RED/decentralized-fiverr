@@ -73,3 +73,9 @@ export interface NextTaskResult{
     message?:string;
     task?:NextTaskType,
 }
+
+export interface Payout{
+    status?:string,
+    amount?:number,
+    message?:string,
+}
