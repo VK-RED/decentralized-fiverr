@@ -13,7 +13,8 @@
     "./imageHandler":"./src/imageHandler.tsx",
     "./webclient":"./src/webClient.tsx",
     "./taskOptionsRenderer" : "./src/taskOptionsRenderer.tsx",
-    "./nextTask":"./src/nextTask.tsx"
+    "./nextTask":"./src/nextTask.tsx",
+    "./nextTaskOpts":"./src/nextTaskOpts.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
