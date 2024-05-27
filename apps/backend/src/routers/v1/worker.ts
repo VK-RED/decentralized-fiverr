@@ -82,7 +82,7 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
         const limit = 100;
         const bounty = task.amount/limit; // The bounty will be in lamports
 
-        await db.$transaction(async(tx)=>{
+        const result = await db.$transaction(async(tx)=>{
             const newSubmission = await tx.submission.create({
                 data:{
                     taskId,
@@ -117,11 +117,11 @@ workerRouter.post("/submission",workerAuth,async(req,res)=>{
                 }
             })
             
-            return res.json({amount:newSubmission.amount})
+            return {amount:newSubmission.amount};
             
         })
         
-        return res.json({message:"Error in Submitting the task"})
+        return res.json(result);
         
 
     } catch (error) {
