@@ -7,6 +7,11 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
 
     const [balance,setBalance] = useState<GetBalance>({availableAmount:0,lockedAmount:0});
     const { publicKey } = useWallet();
+    const [loading,setLoading] = useState(true);
+    
+    useEffect(()=>{
+        setLoading(false);
+    },[])
 
     useEffect(()=>{
         // console.log("Public key is : ",publicKey);
@@ -14,10 +19,6 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
             getBalance();
         }
     },[])
-
-    useEffect(()=>{
-        console.log("Public key is : ",publicKey);
-    },[publicKey])
 
     const getBalance = async()=>{
         const token = localStorage.getItem('token');
@@ -82,7 +83,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                     }
                     <div className="font-semibold cursor-pointer">
                         {
-                            (publicKey)?<WalletDisconnectButton/>:<WalletMultiButton/>
+                            (!loading ? (publicKey ? <WalletDisconnectButton/>:<WalletMultiButton/>) : null)
                         }
                     </div>
                 </div>
