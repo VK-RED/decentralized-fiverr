@@ -2,16 +2,22 @@
 import { BACKEND_URL, TOTAL_DECIMAL } from "@repo/common/messages";
 import { GetBalance, Payout, ResultMessage } from "@repo/common/types";
 import React, { useEffect, useState } from "react"
-
+import {WalletDisconnectButton, WalletMultiButton, useWallet} from "@repo/sol/solana-configs"
 export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorkerNav:boolean}) => {
 
     const [balance,setBalance] = useState<GetBalance>({availableAmount:0,lockedAmount:0});
+    const { publicKey } = useWallet();
 
     useEffect(()=>{
+        // console.log("Public key is : ",publicKey);
         if(isWorkerNav){
             getBalance();
         }
     },[])
+
+    useEffect(()=>{
+        console.log("Public key is : ",publicKey);
+    },[publicKey])
 
     const getBalance = async()=>{
         const token = localStorage.getItem('token');
@@ -75,7 +81,9 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                         </button>
                     }
                     <div className="font-semibold cursor-pointer">
-                        CONNECT MY WALLET
+                        {
+                            (publicKey)?<WalletDisconnectButton/>:<WalletMultiButton/>
+                        }
                     </div>
                 </div>
             </div> 
