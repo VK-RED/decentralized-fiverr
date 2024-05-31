@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "exports":{
-    "./solanaProvider":"./src/SolanaProvider.tsx"
+    "./solanaProvider":"./src/SolanaProvider.tsx",
+    "./solana-configs":"./src/SolanaConfigs.tsx"
   },
   "dependencies": {
     "@solana/wallet-adapter-base": "^0.9.23",
