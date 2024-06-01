@@ -8,6 +8,10 @@ import { ZodError } from 'zod';
 import {postTaskSchema} from "@repo/common/schema";
 import {TaskOptions,ResultMessage,GetTask} from "@repo/common/types";
 import {TOTAL_DECIMAL} from "@repo/common/messages";
+import { PublicKey } from "@solana/web3.js";
+
+import nacl from "tweetnacl";
+
 const bucket = process.env.AWS_BUCKET_NAME as string;
 
 export const userRouter = Router();
@@ -41,14 +45,40 @@ userRouter.get("/presignedUrl",auth,async (req,res)=>{
 })
 
 userRouter.post("/signin",async(req:Request,res:Response)=>{
-    const WalletAddress = "HL3WVRERVREV8REER75VER6"
+    const {publicKey,signature}:{publicKey?:string,signature?:{[key:string]:number}} = req.body;
+
+    if(!publicKey || !signature){
+        return res.json({message:"PUBLICKEY OR SIGNATURE MISSING !!"})
+    }
+
+    //convert signature to u8intarr
+    const dataarr = Object.values(signature).map((v)=>v)
+    const signatureArr = Uint8Array.from(dataarr);
+    console.log(signatureArr);
+
+    //convert message to u8int
+    const message = "TUDUM";
+    const messageBytes = new TextEncoder().encode(message);
+
+    const result = nacl.sign.detached.verify(
+        messageBytes,
+        signatureArr,
+        new PublicKey(publicKey).toBytes()
+    );
+    
+    console.log(result);
+
+    if(!result){
+        return res.json({message:"YOU DON'T HAVE PERMISSIONS !"})
+    }
+
     const user = await db.user.upsert({
         where:{
-            address:WalletAddress
+            address:publicKey
         },
         update:{},
         create:{
-            address:WalletAddress,
+            address:publicKey,
         }
     })
     console.log(user);
