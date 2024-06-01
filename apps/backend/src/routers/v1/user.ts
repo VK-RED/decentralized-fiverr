@@ -6,7 +6,7 @@ import { generateRandomString } from '../../utils';
 import { auth } from '../../middleware';
 import { ZodError } from 'zod';
 import {postTaskSchema} from "@repo/common/schema";
-import {TaskOptions,ResultMessage,GetTask} from "@repo/common/types";
+import {TaskOptions,ResultMessage,GetTask, SignIn} from "@repo/common/types";
 import {TOTAL_DECIMAL} from "@repo/common/messages";
 import { PublicKey } from "@solana/web3.js";
 
@@ -45,8 +45,7 @@ userRouter.get("/presignedUrl",auth,async (req,res)=>{
 })
 
 userRouter.post("/signin",async(req:Request,res:Response)=>{
-    const {publicKey,signature}:{publicKey?:string,signature?:{[key:string]:number}} = req.body;
-
+    const {publicKey,signature}:SignIn = req.body;
     if(!publicKey || !signature){
         return res.json({message:"PUBLICKEY OR SIGNATURE MISSING !!"})
     }

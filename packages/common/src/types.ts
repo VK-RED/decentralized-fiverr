@@ -79,3 +79,8 @@ export interface Payout{
     amount?:number,
     message?:string,
 }
+
+export interface SignIn{
+    publicKey?:string,
+    signature?:{[key:string]:number}
+}
