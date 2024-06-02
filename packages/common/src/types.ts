@@ -82,5 +82,7 @@ export interface Payout{
 
 export interface SignIn{
     publicKey?:string,
-    signature?:{[key:string]:number}
+    signature?:{
+        data:number[]
+    }|{[key:string]:number}
 }

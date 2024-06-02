@@ -50,8 +50,15 @@ userRouter.post("/signin",async(req:Request,res:Response)=>{
         return res.json({message:"PUBLICKEY OR SIGNATURE MISSING !!"})
     }
 
+    let dataarr;
     //convert signature to u8intarr
-    const dataarr = Object.values(signature).map((v)=>v)
+    if("data" in signature){
+        dataarr = Object.values(signature.data).map((v)=>v)
+    }
+    else{
+        dataarr = Object.values(signature).map((v)=>v)
+    }
+
     const signatureArr = Uint8Array.from(dataarr);
     console.log(signatureArr);
 
