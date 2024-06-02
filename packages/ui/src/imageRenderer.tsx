@@ -3,10 +3,47 @@
 import { BACKEND_URL, TASK_SUCCESS, UPLOAD_SUCCESS } from "@repo/common/messages";
 import { ImageRendererProps } from "@repo/common/types";
 import type { PostTask, PostTaskResult } from "@repo/common/types";
+import { PublicKey, SystemProgram, useConnection, useWallet, Transaction } from "@repo/sol/solana-configs";
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from "react";
 
 export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
     const router = useRouter();
+    //send money from userwallet to your wallet of 0.1 sol
+    const [txSignature,setTxsignature]=useState("");
+    const {publicKey,sendTransaction} = useWallet();
+    const{connection} = useConnection();
+
+    useEffect(()=>{
+        console.log("The Transaction Signature : ",txSignature)
+    },[txSignature])
+
+    const transferSol = async()=>{
+        if(publicKey){
+             //THis is the fn to transfer to the master wallet 
+            const masterWallet = "FhvwrtAkSHaEvPjTtKMnMsBb4JFcjdSMq99Phh9Jdkqi";
+            const transaction = new Transaction()
+            const transferInstruction = SystemProgram.transfer({
+                fromPubkey:publicKey,
+                toPubkey:new PublicKey(masterWallet),
+                lamports:1_000_000_00 // 0.1 SOL
+            });
+            transaction.add(transferInstruction);
+
+
+            const {
+                context: { slot: minContextSlot },
+                value: { blockhash, lastValidBlockHeight }
+            } = await connection.getLatestBlockhashAndContext();
+    
+            const signature = await sendTransaction(transaction, connection, { minContextSlot });
+    
+            await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
+            setTxsignature((p)=>signature);
+        }
+       
+    }
+
     const uploadToS3 = async(presignedUrls:{url:string}[]) => {
         if(!images)return;
         if(!task){
@@ -149,9 +186,16 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
 
             {
                 images?.length > 0 &&
-                <button onClick={handleSubmit}
+                <button onClick={()=>{
+                    if(txSignature){
+                        handleSubmit();
+                    }
+                    else{
+                        transferSol();
+                    }
+                }}
                     className="text-md mt-5 bg-black text-white px-2 py-1 rounded-md font-medium">
-                    Submit
+                    {txSignature ? 'Submit' : 'Pay 0.1 SOL'}
                 </button>
             }
         </div>  
