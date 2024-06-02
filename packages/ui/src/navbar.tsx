@@ -30,18 +30,23 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
             const message = "TUDUM";
             const signature = await signMessage(new TextEncoder().encode(message));
             const person = isWorkerNav ? 'worker' : 'user';
-            const res = await fetch(`${BACKEND_URL}v1/${person}/signin`,{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body:JSON.stringify({
-                    signature,
-                    publicKey:publicKey.toString()
-                })
-            });
-            const data = await res.json();
-            console.log(data);
+            try {
+                const res = await fetch(`${BACKEND_URL}v1/${person}/signin`,{
+                    method:"POST",
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify({
+                        signature,
+                        publicKey:publicKey.toString()
+                    })
+                });
+                const data = await res.json();
+                console.log(data);
+            } catch (error) {
+                console.log(error)
+            }
+            
         }
     }
 
