@@ -8,7 +8,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
     const [balance,setBalance] = useState<GetBalance>({availableAmount:0,lockedAmount:0});
     const { publicKey,signMessage } = useWallet();
     const [loading,setLoading] = useState(true);
-    
+    const [verified,setIsVerified] = useState(false);
     useEffect(()=>{
         setLoading(false);
     },[])
@@ -19,15 +19,15 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
     },[publicKey])
 
     useEffect(()=>{
-        
-        if(isWorkerNav){
+        if(isWorkerNav && verified){
+            console.log("cliecked")
             getBalance();
         }
-    },[])
+    },[verified])
 
     const verifyAccount = async()=>{
         if(publicKey && signMessage){
-            const message = "TUDUM";
+            const message = (!isWorkerNav) ? "TUDUM" : "TUDUMWORKER";
             const signature = await signMessage(new TextEncoder().encode(message));
             const person = isWorkerNav ? 'worker' : 'user';
             try {
@@ -45,6 +45,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                 const token = data.token;
                 if(token){
                     localStorage.setItem('token',token);
+                    setIsVerified(true);
                 }
             } catch (error) {
                 console.log(error)
@@ -66,7 +67,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
         if("availableAmount" && "lockedAmount" in data){
             setBalance((p)=>({availableAmount:data.availableAmount,lockedAmount:data.lockedAmount}))
         }
-        console.log();
+        console.log(data);
     }   
 
     const getPaid = async()=>{
