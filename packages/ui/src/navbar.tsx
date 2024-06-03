@@ -19,7 +19,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
     },[publicKey])
 
     useEffect(()=>{
-        // console.log("Public key is : ",publicKey);
+        
         if(isWorkerNav){
             getBalance();
         }
@@ -42,7 +42,10 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                     })
                 });
                 const data = await res.json();
-                console.log(data);
+                const token = data.token;
+                if(token){
+                    localStorage.setItem('token',token);
+                }
             } catch (error) {
                 console.log(error)
             }
