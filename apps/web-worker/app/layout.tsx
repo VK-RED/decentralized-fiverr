@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Navbar } from "@repo/ui/navbar";
 import "./globals.css";
+import { SolanaProvider } from "@repo/sol/solanaProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar isWorkerNav={true}>
-          {children}
-        </Navbar>
+        <SolanaProvider>
+          <Navbar isWorkerNav={false}>
+            {children}
+          </Navbar>
+        </SolanaProvider>
       </body>
     </html>
   );
