@@ -5,24 +5,54 @@ import { workerAuth } from '../../middleware';
 import { submissionSchema } from '@repo/common/schema';
 import { ZodError } from 'zod';
 import { getNextTask } from '../../db';
+import { SignIn } from '@repo/common/types';
+import nacl from 'tweetnacl';
+import { PublicKey } from '@solana/web3.js';
 
 export const workerRouter = Router();
 
 
 workerRouter.post("/signin",async(req,res)=>{
 
-    const workerSecret = process.env.WORKER_JWT_SECRET as string;
-    
-    //TODO : FIX THE WALLETADDRESS LATER;
+    const {publicKey,signature}:SignIn = req.body;
+    if(!publicKey || !signature){
+        return res.json({message:"PUBLICKEY OR SIGNATURE MISSING !!"})
+    }
 
-    const WalletAddress = "JKN3RJKB13JKJ134K";
+    let dataarr;
+    //convert signature to u8intarr
+    if("data" in signature){
+        dataarr = Object.values(signature.data).map((v)=>v)
+    }
+    else{
+        dataarr = Object.values(signature).map((v)=>v)
+    }
+
+    const signatureArr = Uint8Array.from(dataarr);
+    console.log(signatureArr);
+
+    //convert message to u8int
+    const message = "TUDUMWORKER";
+    const messageBytes = new TextEncoder().encode(message);
+
+    const result = nacl.sign.detached.verify(
+        messageBytes,
+        signatureArr,
+        new PublicKey(publicKey).toBytes()
+    );
+
+    if(!result){
+        return res.json({message:"YOU DON'T HAVE PERMISSIONS !"})
+    }
+
+    const workerSecret = process.env.WORKER_JWT_SECRET as string;
 
     const worker = await db.worker.upsert({
         where:{
-            address:WalletAddress,
+            address:publicKey,
         },
         create:{
-            address:WalletAddress,
+            address:publicKey,
         },
         update:{}
     });
