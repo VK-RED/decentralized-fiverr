@@ -13,7 +13,8 @@
     "react-dom": "^18",
     "next": "14.2.3",
     "@repo/tailwind-config":"*",
-    "@repo/ui":"*"
+    "@repo/ui":"*",
+    "@repo/sol":"*"
   },
   "devDependencies": {
     "typescript": "^5",
