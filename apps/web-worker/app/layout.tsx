@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SolanaProvider>
-          <Navbar isWorkerNav={false}>
+          <Navbar isWorkerNav={true}>
             {children}
           </Navbar>
         </SolanaProvider>
