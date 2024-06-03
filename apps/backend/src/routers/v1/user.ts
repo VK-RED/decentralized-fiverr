@@ -8,7 +8,7 @@ import { ZodError } from 'zod';
 import {postTaskSchema} from "@repo/common/schema";
 import {TaskOptions,ResultMessage,GetTask, SignIn} from "@repo/common/types";
 import {TOTAL_DECIMAL} from "@repo/common/messages";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey,Connection,clusterApiUrl, ConfirmedTransactionMeta } from "@solana/web3.js";
 
 import nacl from "tweetnacl";
 
@@ -26,6 +26,53 @@ const generatePresignedUrl = async(userId:string)=>{
     };
     const url = s3.getSignedUrl('putObject', params);
     return {url,key};
+}
+
+const verifyTxn = async({payer,payee,txnMeta,userId}:{payer?:string,payee?:string,txnMeta:ConfirmedTransactionMeta|null,userId:string})=>{
+
+    if(!payer || !payee || !txnMeta){
+        return {message:"CAN'T FIND PAYER OR PAYEE OR TXNMETA"}
+    }
+
+    console.log(payee);
+    
+    const user = await db.user.findUnique({
+        where:{
+            id:userId
+        }
+    });
+
+    if(!user){
+        return {message:"NO USER FOUND"}
+    }
+
+
+    if(user.address !== payer){
+        return {message:"YOU ARE NOT THE PAYER !!"};
+    }
+
+    if(payee !== process.env.NEXT_PUBLIC_MASTER_WALLET){
+        return {message:"YOU HAVE NOT TRANSFERRED THE SOL TO THE PLATFORM , YOU HAVE SENT TO SOME OTHER ADDRESS"}
+    }
+    
+    const {preBalances,postBalances} = txnMeta;
+    
+    const preBalance = preBalances[1];
+    const postBalance = postBalances[1];
+
+    if(!preBalance || !postBalance){
+        return {message:"INTERNAL ERROR IN GETTING PRE AND POST BALANCES OF MASTER"}
+    }
+
+
+    console.log("Prebalance : ",preBalance);
+    console.log("PostBalance : ",postBalance);
+
+    if(postBalance - preBalance !== 1_000_000_00){
+        return {message:"YOU HAVE NOT PAID THE CORRECT PLATFORM FEE !"}
+    }
+
+    return {message:"SUCCESS"};
 }
 
 userRouter.get("/presignedUrl",auth,async (req,res)=>{
@@ -98,15 +145,34 @@ userRouter.post("/task",auth,async(req,res)=>{
         const body = postTaskSchema.parse(req.body);
         const userId = req.body.userId as string;
 
-        //TODO: VALIDATE THE SIGNATURE FROM BODY
+        // VALIDATE THE TXN_SIGNATURE
+        const {signature:txnId} = body;
+        const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+        const txResponse = await connection.getTransaction(txnId,{ maxSupportedTransactionVersion: 0 });
 
-        // FOR NOW ASSUMING SIGNATURE IS VALID;
+        if(!txResponse){
+            return res.json({message:"Enter Valid Transaction Signature !!"});
+        }
+
+        const txn = txResponse.transaction;
+        const accountKeys = txResponse.transaction.message.staticAccountKeys;
+        const payer = accountKeys[0]?.toString();
+        const payee = accountKeys[1]?.toString();
+        const txnMeta = txResponse.meta;
+
+        const {message} = await verifyTxn({payer,payee,txnMeta,userId});
+
+        if(message !== "SUCCESS"){
+            return res.json({message});
+        }
 
         //CREATING THE TASK (You will be getting the amount in SOL -> Convert to LAMPORT)
 
+        const taskAmount = TOTAL_DECIMAL/10;
+
         const task = await db.task.create({
             data:{
-                amount:body.amount*TOTAL_DECIMAL,
+                amount:taskAmount,
                 signature:body.signature,
                 title:body.title || "Select the Attractive Image",
                 userId,
