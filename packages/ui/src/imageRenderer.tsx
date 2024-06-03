@@ -5,7 +5,7 @@ import { ImageRendererProps } from "@repo/common/types";
 import type { PostTask, PostTaskResult } from "@repo/common/types";
 import { PublicKey, SystemProgram, useConnection, useWallet, Transaction } from "@repo/sol/solana-configs";
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
     const router = useRouter();
@@ -14,14 +14,10 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
     const {publicKey,sendTransaction} = useWallet();
     const{connection} = useConnection();
 
-    useEffect(()=>{
-        console.log("The Transaction Signature : ",txSignature)
-    },[txSignature])
-
     const transferSol = async()=>{
         if(publicKey){
-             //THis is the fn to transfer to the master wallet 
-            const masterWallet = "FhvwrtAkSHaEvPjTtKMnMsBb4JFcjdSMq99Phh9Jdkqi";
+            
+            const masterWallet = process.env.NEXT_PUBLIC_MASTER_WALLET as string;
             const transaction = new Transaction()
             const transferInstruction = SystemProgram.transfer({
                 fromPubkey:publicKey,
@@ -115,18 +111,18 @@ export const ImageRenderer = ({className,images,task}:ImageRendererProps) => {
             console.log("Enter task name !");
             return;
         }
-        //TODO : FIX THE AMOUNT AND SIGNATURE LATER
-
-        const amount = 1; //Assuming the amount to be 1 SOL
-        const signature = "H43TH43LTV2TG34LT3CJHKXPWIU";
         
         const CLOUDFRONT_URL = process.env.NEXT_PUBLIC_CLOUDFRONT_URL as string;
         const urls = presignedUrls.map((u)=>(`${CLOUDFRONT_URL}/${u.key}`));
-        console.log(urls);
+        const signature = txSignature;
+
+        if(!signature){
+            console.log("Can't submit the task as there is no Signature ID !!");
+        }
+
         const body : PostTask = {
             title:task,
             signature,
-            amount,
             urls
         }
         const token = localStorage.getItem('token') as string;
