@@ -1,11 +1,9 @@
 import { selector } from "recoil";
-import { nextTaskAtom } from "./atoms";
+import { workerVerifiedAtom } from "./atoms";
 
-export const nextTaskSelector = selector({
-    key:"nextTaskSelector",
+export const workerVerifiedSelector = selector({
+    key:'workerVerifiedSelector',
     get:({get})=>{
-        const task = get(nextTaskAtom);
-        return task;
+        return get(workerVerifiedAtom);
     }
 })
-
