@@ -9,7 +9,7 @@
   "exports": {
     "./atom": "./src/atoms.tsx",
     "./selector": "./src/selectors.tsx",
-    "./":"./src/index.tsx"
+    "./recoil":"./src/index.tsx"
   },
   "keywords": [],
   "author": "",
