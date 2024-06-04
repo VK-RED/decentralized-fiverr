@@ -1,3 +1,5 @@
+"use client"
+
 import { NextTaskType } from "@repo/common/types";
 import { atom } from "recoil";
 

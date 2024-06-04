@@ -1,3 +1,5 @@
+"use client";
+
 import { selector } from "recoil";
 import { workerVerifiedAtom } from "./atoms";
 
