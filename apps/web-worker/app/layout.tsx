@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { Navbar } from "@repo/ui/navbar";
 import "./globals.css";
 import { SolanaProvider } from "@repo/sol/solanaProvider";
-
+import { RecoilRoot } from "@repo/store/recoil";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,11 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SolanaProvider>
-          <Navbar isWorkerNav={true}>
-            {children}
-          </Navbar>
-        </SolanaProvider>
+        <RecoilRoot>
+          <SolanaProvider>
+            <Navbar isWorkerNav={true}>
+              {children}
+            </Navbar>
+          </SolanaProvider>
+        </RecoilRoot>
       </body>
     </html>
   );
