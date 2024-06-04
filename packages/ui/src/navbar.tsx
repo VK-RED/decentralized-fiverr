@@ -96,7 +96,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
         <div>
             <div className="w-screen border max-h-16 py-1 flex justify-between px-10 items-center">
                 <div className="font-semibold text-xl font-sans cursor-pointer">
-                    TUDUM
+                    TUDUM {isWorkerNav ? "(Worker)" : ""}
                 </div>
 
                 {/* TODO:IDEALLY SHOW THE BALANCE && PAYOUT WHEN WALLET IS CONNECTED */}
