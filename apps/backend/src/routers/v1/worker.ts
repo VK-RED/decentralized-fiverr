@@ -7,8 +7,8 @@ import { ZodError } from 'zod';
 import { getNextTask } from '../../db';
 import { SignIn } from '@repo/common/types';
 import nacl from 'tweetnacl';
-import { PublicKey } from '@solana/web3.js';
-
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction, clusterApiUrl, sendAndConfirmTransaction } from '@solana/web3.js';
+import {decode} from 'bs58';
 export const workerRouter = Router();
 
 
@@ -214,49 +214,70 @@ workerRouter.post("/payout",workerAuth,async(req,res)=>{
         return res.json({message:"Balance is empty !!"});
     }
 
-    //TODO: Create a transactionId using Solana web3.js
-
     const recepient = worker.address; 
-    const TxnId = "kj3bj34j13n43jk13"
-
-    await db.$transaction(async tx => {
-
-        //Move this amount from available to locked and create a Payout
-
-        await tx.balance.update({
-            where:{
-                workerId,
-            },
-            data:{
-                available_amount:{
-                    decrement:amount.available_amount,
-                },
-                locked_amount:{
-                    increment: amount.available_amount,
-                }
-            }
-        })
-
-        await tx.payout.create({
-            data:{
-                amount:amount.available_amount,
-                status:"Processing",
-                workerId,
-                signature:TxnId
-
-            }
-        })
-
-
+    const payoutIns = SystemProgram.transfer({
+        fromPubkey:new PublicKey(process.env.NEXT_PUBLIC_MASTER_WALLET as string),
+        toPubkey: new PublicKey(recepient),
+        lamports:amount.available_amount
     })
+    const transaction = new Transaction().add(payoutIns);
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const privateKey = process.env.MASTER_WALLET_PRIVATE_ADDRESS as string
+    const signers = Keypair.fromSecretKey(decode(privateKey));
 
-    // TODO : Send the transaction to Blockchain
+    let TxnId;
+    try {
+        TxnId = await sendAndConfirmTransaction(connection,transaction,[signers]);
+        return res.json({
+            status:"Processed the Payouts",
+            amount: amount.available_amount,
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({message:"Error in Transferring Payouts !!"});
+    }
+    
+
+    //For now commenting this .. 
+
+    // await db.$transaction(async tx => {
+
+    //     //Move this amount from available to locked and create a Payout
+
+    //     await tx.balance.update({
+    //         where:{
+    //             workerId,
+    //         },
+    //         data:{
+    //             available_amount:{
+    //                 decrement:amount.available_amount,
+    //             },
+    //             locked_amount:{
+    //                 increment: amount.available_amount,
+    //             }
+    //         }
+    //     })
+
+    //     await tx.payout.create({
+    //         data:{
+    //             amount:amount.available_amount,
+    //             status:"Processing",
+    //             workerId,
+    //             signature:TxnId
+
+    //         }
+    //     })
 
 
-    return res.json({
-        status:"Processing Payout",
-        amount: amount.available_amount,
-    })
+    // })
+
+    // // TODO : Send the transaction to Blockchain
+
+
+    // return res.json({
+    //     status:"Processing Payout",
+    //     amount: amount.available_amount,
+    // })
 
     
 })
