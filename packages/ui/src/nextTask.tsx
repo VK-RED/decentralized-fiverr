@@ -4,14 +4,22 @@ import { BACKEND_URL } from "@repo/common/messages";
 import { DivProps, NextTaskResult, NextTaskType, SubmissionInput, SubmissionResult } from "@repo/common/types";
 import { useEffect, useState } from "react";
 import { NextTaskOpts } from "./nextTaskOpts";
+import { useRecoilValue, useSetRecoilState } from "@repo/store/recoil";
+import { workerVerifiedSelector } from "@repo/store/selector";
+import { workerBalAtom } from "@repo/store/atom";
 
 export const NextTask = ({className}:DivProps) => {
 
     const[nextTask,setNextTask] = useState<NextTaskType>();
-
+    const workerVerf = useRecoilValue(workerVerifiedSelector);
+    const setBalance = useSetRecoilState(workerBalAtom);
     useEffect(()=>{
-        getNextTask();
-    },[])
+        if(workerVerf){
+            //THIS CAN HAPPEN ONLY AFTER THE VERIFICATION AFTER BACKEND
+            getNextTask();
+        }
+    },[workerVerf])
+
 
     const handleSubmit = async(optionId:number)=>{
         await postSubmission(optionId);
@@ -57,6 +65,8 @@ export const NextTask = ({className}:DivProps) => {
         });
         const data:SubmissionResult = await res.json();
         if(data.amount){
+            const bounty = data.amount;
+            setBalance((p)=>({...p,availableAmount:p.availableAmount+bounty}))
             console.log(`You have got ${data.amount}`);
             await getNextTask();
         }

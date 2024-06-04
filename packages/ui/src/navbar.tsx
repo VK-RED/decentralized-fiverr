@@ -3,12 +3,15 @@ import { BACKEND_URL, TOTAL_DECIMAL } from "@repo/common/messages";
 import { GetBalance, Payout, ResultMessage } from "@repo/common/types";
 import React, { useEffect, useState } from "react"
 import {WalletDisconnectButton, WalletMultiButton, useWallet} from "@repo/sol/solana-configs"
+import { useRecoilState } from "@repo/store/recoil";
+import { workerBalAtom, workerVerifiedAtom } from "@repo/store/atom";
 export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorkerNav:boolean}) => {
 
-    const [balance,setBalance] = useState<GetBalance>({availableAmount:0,lockedAmount:0});
+    const [balance,setBalance] = useRecoilState(workerBalAtom);
     const { publicKey,signMessage } = useWallet();
     const [loading,setLoading] = useState(true);
-    const [verified,setIsVerified] = useState(false);
+    const [workerVerf,setWorkerVerf] = useRecoilState(workerVerifiedAtom);
+
     useEffect(()=>{
         setLoading(false);
     },[])
@@ -19,11 +22,11 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
     },[publicKey])
 
     useEffect(()=>{
-        if(isWorkerNav && verified){
+        if(isWorkerNav && workerVerf){
             console.log("cliecked")
             getBalance();
         }
-    },[verified])
+    },[workerVerf])
 
     const verifyAccount = async()=>{
         if(publicKey && signMessage){
@@ -45,7 +48,7 @@ export const Navbar = ({children,isWorkerNav}:{children:React.ReactNode,isWorker
                 const token = data.token;
                 if(token){
                     localStorage.setItem('token',token);
-                    setIsVerified(true);
+                    setWorkerVerf((p)=>true);
                 }
             } catch (error) {
                 console.log(error)
