@@ -19,7 +19,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "build:web" : "dotenv -- turbo build --filter=web",
     "build:web-worker" : "dotenv -- turbo build --filter=web-worker",
-    "build:backend" : "yarn migrate:db && dotenv -- turbo build",
+    "build:backend" : "yarn migrate:db && cd apps/backend && yarn build",
     "start:backend" : "dotenv -- yarn build:backend && cd apps/backend && node dist/index.js"
   },
   "devDependencies": {
