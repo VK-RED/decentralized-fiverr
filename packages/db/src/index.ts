@@ -5,7 +5,7 @@ declare global{
 }
 
 const generatePrismaClient = () => {
-    if(process.env.NODE_ENV === 'development'){
+    if(process.env.NODE_ENVIRONMENT === 'development'){
         if(!globalThis.prisma){
             globalThis.prisma = new PrismaClient();
             console.log("Prisma Client Initialized");
@@ -13,7 +13,7 @@ const generatePrismaClient = () => {
         return globalThis.prisma;
     }
     else{
-        console.log(process.env.NODE_ENV);
+        console.log(process.env.NODE_ENVIRONMENT);
         console.log("Prisma Client Initialied in Production");
         return new PrismaClient();
     }

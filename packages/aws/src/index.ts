@@ -15,7 +15,7 @@ declare global{
 }
 
 function generateS3(){
-    if(process.env.NODE_ENV === 'development'){
+    if(process.env.NODE_ENVIRONMENT === 'development'){
         if(!globalThis.s3){
             console.log("Generating S3 object in local!!")
             globalThis.s3 = new AWS.S3();
