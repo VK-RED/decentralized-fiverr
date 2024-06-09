@@ -13,11 +13,13 @@
     "dev:web":"dotenv -- turbo dev --filter=web",
     "dev:web-worker":"dotenv -- turbo dev --filter=web-worker",
     "loadenv" : "dotenv -e .env",
-    "build": "yarn generate:db && yarn migrate:db && turbo build",
+    "build": "dotenv -- turbo build",
     "dev": "dotenv -- turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "build:web" : "dotenv -- turbo build --filter=web"
+    "build:web" : "dotenv -- turbo build --filter=web",
+    "build:web-worker" : "dotenv -- turbo build --filter=web-worker",
+    "build:backend" : "dotenv -- yarn generate:db && yarn migrate:db && turbo build --filter=backend"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
