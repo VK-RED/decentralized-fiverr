@@ -13,7 +13,7 @@
     "dev:web":"dotenv -- turbo dev --filter=web",
     "dev:web-worker":"dotenv -- turbo dev --filter=web-worker",
     "loadenv" : "dotenv -e .env",
-    "build": "turbo build",
+    "build": "yarn generate:db && yarn migrate:db && turbo build",
     "dev": "dotenv -- turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
