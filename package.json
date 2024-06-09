@@ -19,7 +19,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "build:web" : "dotenv -- turbo build --filter=web",
     "build:web-worker" : "dotenv -- turbo build --filter=web-worker",
-    "build:backend" : "dotenv -- yarn generate:db && yarn migrate:db && turbo build --filter=backend"
+    "build:backend" : "yarn migrate:db && dotenv -- turbo build",
+    "start:backend" : "dotenv -- yarn build:backend && cd apps/backend && node dist/index.js"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
