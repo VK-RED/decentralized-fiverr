@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 
-const accessKey = process.env.AWS_ACCESS_KEY as string;
+const accessKey = process.env.AWS_ACCESS_KEY_ID as string;
 const secretKey = process.env.AWS_SECRET_ACCESS_KEY as string;
 const region = process.env.AWS_REGION as string;
 
